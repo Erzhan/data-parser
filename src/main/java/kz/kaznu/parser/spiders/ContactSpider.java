@@ -23,13 +23,7 @@ public class ContactSpider {
         StringBuilder allContactPagesContent = new StringBuilder();
         try {
             System.out.println("URL = " + url);
-            Document doc = Jsoup
-                    .connect(url)
-                    .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
-                    .header("Accept-Language", "en")
-                    .timeout(20000)
-                    .followRedirects(true)
-                    .get();
+            Document doc = getDocumentByUrl(url);
 
             Set<String> contactUrls = new HashSet<>();
 
@@ -42,13 +36,7 @@ public class ContactSpider {
                     }
                 }
                 for (String contactUrl : contactUrls) {
-                    Document contactDoc = Jsoup
-                            .connect(contactUrl)
-                            .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
-                            .header("Accept-Language", "en")
-                            .timeout(20000)
-                            .followRedirects(true)
-                            .get();
+                    Document contactDoc = getDocumentByUrl(contactUrl);
                     allContactPagesContent.append(" ").append(contactDoc.text());
                 }
             } else {
@@ -60,5 +48,14 @@ public class ContactSpider {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private Document getDocumentByUrl(String url) throws IOException {
+        return Jsoup.connect(url)
+                .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
+                .header("Accept-Language", "en")
+                .timeout(20000)
+                .followRedirects(true)
+                .get();
     }
 }
