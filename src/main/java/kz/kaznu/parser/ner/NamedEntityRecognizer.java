@@ -5,7 +5,12 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -13,6 +18,8 @@ import java.util.Properties;
  * Created by yerzhan.khibatkhanuly on 2/1/18.
  */
 public class NamedEntityRecognizer {
+
+    private final Logger logger = LoggerFactory.getLogger(NamedEntityRecognizer.class);
 
     public void analyzeText(String text) {
         Properties props = new Properties();
@@ -26,23 +33,30 @@ public class NamedEntityRecognizer {
         pipeline.annotate(document);
 
         List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+        StringBuilder s = new StringBuilder();
+        List<String> contacts = new ArrayList<>();
 
         for(CoreMap sentence: sentences) {
             for (CoreLabel token: sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 String word = token.get(CoreAnnotations.TextAnnotation.class);
-//                String lemma = token.get(CoreAnnotations.LemmaAnnotation.class);
-//                String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
-//                String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-                String location = token.get(CoreAnnotations.LocationAnnotation.class);
-                System.out.println("location = " + location);
-//                if(ne.equalsIgnoreCase("location")) {
-//                    System.out.println(word);
-//                }
+                String lemma = token.get(CoreAnnotations.LemmaAnnotation.class);
+                String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+                String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
-//                System.out.println("word = " + word);
-//                System.out.println("pos = " + pos);
-//                System.out.println("ne = " + ne);
+                if(ne.equals("LOCATION") || ne.equals("NUMBER")) {
+                    s.append(" ").append(word);
+                } else {
+                    if(StringUtils.isNotBlank(s.toString())) {
+                        contacts.add(s.toString());
+                    }
+                    s = new StringBuilder();
+                }
             }
+        }
+
+        System.out.println("Addresses:");
+        for (String contact : contacts) {
+            System.out.println("\t" + contact);
         }
     }
 

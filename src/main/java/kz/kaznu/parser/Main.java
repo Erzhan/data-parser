@@ -15,9 +15,13 @@ public class Main {
         NamedEntityRecognizer ner = new NamedEntityRecognizer();
         ContactSpider spider = new ContactSpider();
 
+//        final String urlWithContacts = "https://www.highwinds.com/company/contact-us/";
+//        String content = spider.findAndGetContactWebPageContent(urlWithContacts);
+//        ner.analyzeText(content);
+
         for (Company company : GsonUtils.readCompaniesFromFile()) {
             String content = spider.findAndGetContactWebPageContent("http://" + company.getDomain());
-//            ner.analyzeText(content);
+            ner.analyzeText(content);
         }
     }
 }
